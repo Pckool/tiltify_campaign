@@ -1,6 +1,5 @@
 import { ipcRenderer } from 'electron';
 const $ = require('jquery');
-var emojis = require('emojis');
 var emoji = require('node-emoji');
 
 setInterval(function (){
@@ -10,13 +9,25 @@ setInterval(function (){
             if($('.no-donations').length)
                 $('.no-donations').css('display', 'none');
             console.log('We have Donations!');
+            let highestDonation = {amount:0};
+
             donations.forEach(function(el, i){
                 var $newdiv = $( `<div id="${el.id}" class="donation"></div>`);
                 $(`#${el.id}`).append(`<div>Name: ${el.name}</div>`);
                 $(`#${el.id}`).append(`<div>Amount: ${el.amount}</div>`);
                 $(`#${el.id}`).append(`<div>Comment: ${el.comment}</div>`);
                 $('#donations').prepend($newdiv);
+
+
+                if(i===0){
+                    ipcRenderer.send('write-lastest-donation', el);
+                }
+
+                if(el.amount > highestDonation.amount){
+                    highestDonation = el;
+                }
             });
+            ipcRenderer.send('write-highest-donation', highestDonation);
         }
         else{
             if(! $('.no-donations').length)

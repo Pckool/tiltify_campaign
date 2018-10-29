@@ -1,7 +1,7 @@
 {
   "name": "tiltify_campaign",
   "productName": "tiltify_campaign",
-  "version": "1.0.0",
+  "version": "1.0.5",
   "description": "My Electron application description",
   "main": "src/index.js",
   "scripts": {
@@ -29,16 +29,20 @@
         ]
       },
       "electronPackagerConfig": {
-        "packageManager": "npm"
+        "packageManager": "npm",
+        "asar": true
       },
       "electronWinstallerConfig": {
-        "name": "tiltify_campaign"
+        "name": "tiltify_campaign",
+        "loadingGif": "./src/media/loading-1000x1000a.gif",
+        "setupIcon": "./src/media/warframe_fan_channel_logo_png__1__VBa_icon.ico",
+        "certificateFile": "./hello@philippec.me.pfx"
       },
       "electronInstallerDebian": {},
       "electronInstallerRedhat": {},
       "github_repository": {
-        "owner": "",
-        "name": ""
+        "owner": "Pckool",
+        "name": "tiltify_campaign"
       },
       "windowsStoreConfig": {
         "packageName": "",
@@ -48,7 +52,10 @@
   },
   "dependencies": {
     "electron-compile": "^6.4.3",
-    "electron-squirrel-startup": "^1.0.0"
+    "electron-squirrel-startup": "^1.0.0",
+    "jquery": "^3.3.1",
+    "node-emoji": "^1.8.1",
+    "request": "^2.88.0"
   },
   "devDependencies": {
     "babel-plugin-transform-async-to-generator": "^6.24.1",
