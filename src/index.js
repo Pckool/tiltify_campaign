@@ -20,18 +20,9 @@ var saveLocation;
 var appReady = false;
 
 // set up the data to push to the tiltify API (headers)
-var req_options = {
-    url: request_url_campaign,
-    headers: {
-        'Authorization': `Bearer ${access_token}`
-    }
-}
-var req_options_donations = {
-    url: request_url_campaigns_donationMessages,
-    headers: {
-        'Authorization': `Bearer ${access_token}`
-    }
-}
+var req_options_find;
+var req_options;
+var req_options_campaign;
 
 // Are we allowed to continue fetching?
 var goodToGo = true;
@@ -65,28 +56,32 @@ const createWindow = () => {
     });
 
     mainWindow.once('ready-to-show', () => {
-        fs.readFile(`${__dirname}\\tokens.json`, function(err, data){
-            let parsedData = JSON.parse(data);
-            console.log(parsedData);
-            access_token = parsedData.data.access_token;
-            console.log('yeet1: ' + access_token);
-            appReady = true;
-            req_options = {
-                url: request_url_campaigns_donationMessages,
-                headers: {
-                    'Authorization': `Bearer ${access_token}`
-                }
-            };
-            req_options_donations = {
-                url: request_url_campaign,
-                headers: {
-                    'Authorization': `Bearer ${access_token}`
-                }
-            };
-            getTiltifyData();
-            mainWindow.show();
-
-        });
+        let data = fs.readFileSync(`${__dirname}\\tokens.json`);
+        let parsedData = JSON.parse(data);
+        console.log(parsedData);
+        access_token = parsedData.data.access_token;
+        console.log('yeet1: ' + access_token);
+        appReady = true;
+        req_options = {
+            url: request_url_campaigns_donationMessages,
+            headers: {
+                'Authorization': `Bearer ${access_token}`
+            }
+        };
+        req_options_campaign = {
+            url: request_url_campaign,
+            headers: {
+                'Authorization': `Bearer ${access_token}`
+            }
+        };
+        req_options_find = {
+            url: request_url_campaigns,
+            headers: {
+                'Authorization': `Bearer ${access_token}`
+            }
+        }
+        getTiltifyData();
+        mainWindow.show();
     });
 
 };
@@ -127,7 +122,7 @@ function getTiltifyData(){
             });
         }
         else{
-            request(req_options, (err, res, body) => {
+            request(req_options_campaign, (err, res, body) => {
                 if(err) console.error(err);
                 console.log(body);
                 var parsedBody = JSON.parse(body);
@@ -169,19 +164,13 @@ function getTiltifyData(){
                 }
                 else{
                     console.log('Saving ' + saveLocation + '\\fundraiser_goal.txt');
-                    fs.writeFile(saveLocation+'\\fundraiser_goal.txt', parseInt(fundraiserGoalAmount), (err) => {
-                        if (err) throw err;
-                    });
+                    fs.writeFileSync(saveLocation+'\\fundraiser_goal.txt', parseInt(fundraiserGoalAmount) );
 
                     console.log('Saving ' + saveLocation + '\\amount_raised.txt');
-                    fs.writeFile(saveLocation+'\\amount_raised.txt', parseInt(amountRaised), (err) => {
-                        if (err) throw err;
-                    });
+                    fs.writeFileSync(saveLocation+'\\amount_raised.txt', parseInt(amountRaised) );
 
                     console.log('Saving ' + saveLocation + '\\total_amount_raised.txt');
-                    fs.writeFile(saveLocation+'\\total_amount_raised.txt', parseInt(totalAmountRaised), (err) => {
-                        if (err) throw err;
-                    });
+                    fs.writeFileSync(saveLocation+'\\total_amount_raised.txt', parseInt(totalAmountRaised) );
                 }
             });
         }
@@ -200,22 +189,23 @@ ipcMain.on('get-new-donations', function(event, arg){
     if(saveLocation){
         getTiltifyData();
     }
-    request(req_options_donations, (err, res, body) => {
+    request(req_options, (err, res, body) => {
         var parsedBody = JSON.parse(body);
+        console.log(parsedBody);
         event.sender.send('donations', parsedBody.data)
     });
 });
 
 ipcMain.on('write-lastest-donation', function(event, arg){
-    let dataToWrite = `Latest Donation: ${arg.name} ( ${arg.amount} )`
-    fs.writeFile(saveLocation+'\\latest_donation.txt', dataToWrite, function(err){
-        if(err) throw err;
-    });
+    if(saveLocation && saveLocation !== ''){
+        let dataToWrite = `Latest Donation: ${arg.name} ( ${arg.amount} )`
+        fs.writeFileSync(saveLocation+'\\latest_donation.txt', dataToWrite);
+    }
 });
 
 ipcMain.on('write-highest-donation', function(event, arg){
-    let dataToWrite = `Latest Donation: ${arg.name} ( ${arg.amount} )`
-    fs.writeFile(saveLocation+'\\highest_donation.txt', dataToWrite, function(err){
-        if(err) throw err;
-    });
+    if(saveLocation && saveLocation !== ''){
+        let dataToWrite = `Latest Donation: ${arg.name} ( ${arg.amount} )`
+        fs.writeFileSync(saveLocation+'\\highest_donation.txt', dataToWrite);
+    }
 });
