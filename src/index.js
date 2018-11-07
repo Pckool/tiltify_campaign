@@ -43,7 +43,7 @@ const createWindow = () => {
     backgroundColor: '#272a2d',
     darkTheme: true,
     show: false,
-    icon: `${__dirname}/media/warframe_fan_channel_logo_png__1__VBa_icon.ico`
+    icon: `${__dirname}/media/app.ico`
   });
 
   mainWindow.loadURL(`file://${__dirname}/index.html`);
